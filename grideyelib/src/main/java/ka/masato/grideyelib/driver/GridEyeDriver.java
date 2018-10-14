@@ -4,8 +4,12 @@ import com.google.android.things.pio.I2cDevice;
 import com.google.android.things.pio.PeripheralManager;
 import ka.masato.grideyelib.driver.enums.FrameRate;
 import ka.masato.grideyelib.driver.enums.IntruptMode;
+import ka.masato.grideyelib.driver.exception.GridEyeDriverErrorException;
+import ka.masato.grideyelib.driver.exception.GridEyeDriverErrorExceptions;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class GridEyeDriver {
 
@@ -115,26 +119,104 @@ public class GridEyeDriver {
         return ret == (byte) 0x20;
     }
 
-    public void setInterruptLevel(short intHighLevel, short intLowLevel, short hstLevel) {
+    public void setInterruptLevel(short intHighLevel, short intLowLevel, short hstLevel)
+            throws GridEyeDriverErrorException, IOException {
 
-        if (127.9375 >= intHighLevel && intHighLevel >= -59.6875) {
-
+        if (validateTempratureLimit(intHighLevel)) {
+            throw new GridEyeDriverErrorException("INT_LEVEL_HIGHT is sensor limit over.");
         }
 
-        if (127.9375 >= intLowLevel && intLowLevel >= -59.6875) {
-
+        if (validateTempratureLimit(intLowLevel)) {
+            throw new GridEyeDriverErrorException("INT_LEVEL_LOW is sensor limit over.");
         }
 
-        if (127.9375 >= hstLevel && hstLevel >= -59.6875) {
-
+        if (validateTempratureLimit(hstLevel)) {
+            throw new GridEyeDriverErrorException("HYSTERISYS_LEVEL is sensor limit over.");
         }
+
+        ByteBuffer payload = ByteBuffer.allocate(6);
+        payload.put(getTwelveBitFromShort(intHighLevel));
+        payload.put(getTwelveBitFromShort(intLowLevel));
+        payload.put(getTwelveBitFromShort(hstLevel));
+
+        i2cDevice.writeRegBuffer(0x08, payload.array(), payload.array().length);
 
     }
 
-    private byte[] secondComplement(short value) {
-
-
-        return new byte[2];
+    public double getIntHightLevel() throws IOException {
+        byte[] result = new byte[2];
+        i2cDevice.readRegBuffer(0x08, result, result.length);
+        return (double) getShortFromTwelveBit(result) * 0.25;
     }
+
+    public double getIntLowLevel() throws IOException {
+        byte[] result = new byte[2];
+        i2cDevice.readRegBuffer(0x0A, result, result.length);
+        return (double) getShortFromTwelveBit(result) * 0.25;
+    }
+
+    public double getHstLevel() throws IOException {
+        byte[] result = new byte[2];
+        i2cDevice.readRegBuffer(0x0C, result, result.length);
+        return (double) getShortFromTwelveBit(result) * 0.25;
+    }
+
+    public double getThermisterTemplature() throws IOException {
+        byte[] result = new byte[2];
+        i2cDevice.readRegBuffer(0x0E, result, result.length);
+        return (double) getShortFromTwelveBit(result) * 0.0625;
+    }
+
+
+    public byte[] getInterruptedPixels() throws IOException {
+        byte[] result = new byte[8];
+        i2cDevice.readRegBuffer(0x10, result, result.length);
+        return result;
+    }
+
+    public short[] getTemperatures() throws IOException {
+        byte[] buffer = new byte[64 * 2];
+        i2cDevice.readRegBuffer(0x80, buffer, buffer.length);
+        short[] results = new short[64];
+
+        ByteBuffer bb = ByteBuffer.wrap(buffer).order(ByteOrder.BIG_ENDIAN);
+        byte[] twoByteBuffer = new byte[2];
+
+        for (int i = 0; i < 64; i++) {
+            bb.position(i * 2).limit((i * 2) + 2);
+            bb.get(twoByteBuffer);
+            results[i] = getShortFromTwelveBit(twoByteBuffer);
+        }
+
+        return results;
+    }
+
+
+    private boolean validateTempratureLimit(short value) {
+        //AMG8833 is below temprature range.
+        return !(0.000 >= value || value >= 80.000);
+
+    }
+
+    private byte[] getTwelveBitFromShort(short value) {
+        ByteBuffer bb = ByteBuffer.allocate(2).order(ByteOrder.BIG_ENDIAN);
+        bb.putShort(value);
+        byte[] result = bb.array();
+        result[0] &= 0x0F;
+        return result;
+    }
+
+    private short getShortFromTwelveBit(byte[] value) {
+        if (value.length != 2) {
+            throw new GridEyeDriverErrorExceptions("Value should be 2 byte length.");
+        }
+
+        if ((value[0] & 0x08) == 0x08) {
+            value[0] |= 0xF0;
+        }
+        return ByteBuffer.wrap(value).order(ByteOrder.BIG_ENDIAN).getShort();
+    }
+
+
 
 }
