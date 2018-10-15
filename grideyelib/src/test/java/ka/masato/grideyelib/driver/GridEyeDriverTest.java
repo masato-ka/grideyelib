@@ -31,7 +31,7 @@ public class GridEyeDriverTest {
 
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() throws Exception, GridEyeDriverErrorException {
     }
 
     @Test
@@ -51,6 +51,7 @@ public class GridEyeDriverTest {
         } catch (IOException e) {
             fail();
         }
+        target.close();
     }
 
     @Test(expected = IOException.class)
@@ -58,7 +59,7 @@ public class GridEyeDriverTest {
         target.setmPeripheralManager(mockPeripheralManager);
         doThrow(new IOException()).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
         target.open("I2C1", 0x68);
-
+        target.close();
     }
 
     @Test
@@ -74,9 +75,9 @@ public class GridEyeDriverTest {
         target.close();
     }
 
+
     @Test(expected = GridEyeDriverErrorException.class)
     public void closeTestAbnormal01() throws IOException, GridEyeDriverErrorException {
-        doNothing().when(mockI2cDevice).close();
         target.close();
     }
 
@@ -95,11 +96,71 @@ public class GridEyeDriverTest {
 
 
     @Test
-    public void flagRest() {
+    public void flagRestTest01() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        try {
+            target.open("I2C1", 0x68);
+        } catch (IOException e) {
+            fail();
+        }
+
+        doNothing().when(mockI2cDevice).writeRegByte((byte) 0x01, (byte) 0x30);
+        target.flagRest();
+        verify(mockI2cDevice, times(1)).writeRegByte(0x01, (byte) 0x30);
+        target.close();
+    }
+
+
+    @Test(expected = IOException.class)
+    public void flagRestTestAbnormal01() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        try {
+            target.open("I2C1", 0x68);
+        } catch (IOException e) {
+            fail();
+        }
+
+        doThrow(new IOException()).when(mockI2cDevice).writeRegByte((byte) 0x01, (byte) 0x30);
+
+        target.flagRest();
+        target.close();
     }
 
     @Test
-    public void initialRest() {
+    public void initialRestTest01() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        try {
+            target.open("I2C1", 0x68);
+        } catch (IOException e) {
+            fail();
+        }
+
+        doNothing().when(mockI2cDevice).writeRegByte((byte) 0x01, (byte) 0x3F);
+        target.initialRest();
+        verify(mockI2cDevice, times(1)).writeRegByte(0x01, (byte) 0x3F);
+        target.close();
+    }
+
+    @Test(expected = IOException.class)
+    public void initialRestTestAbnormal01() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        try {
+            target.open("I2C1", 0x68);
+        } catch (IOException e) {
+            fail();
+        }
+
+        doThrow(new IOException()).when(mockI2cDevice).writeRegByte((byte) 0x01, (byte) 0x3F);
+        target.initialRest();
+        verify(mockI2cDevice, times(1)).writeRegByte(0x01, (byte) 0x3F);
+        target.close();
     }
 
     @Test

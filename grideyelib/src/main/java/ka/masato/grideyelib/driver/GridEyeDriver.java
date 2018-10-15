@@ -41,6 +41,8 @@ public class GridEyeDriver {
             throw new GridEyeDriverErrorException("GridEyeDevice can not close before device open.");
         }
         i2cDevice.close();
+        mManager = null;
+        i2cDevice = null;
     }
 
     public void flagRest() throws IOException {
