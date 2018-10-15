@@ -13,6 +13,7 @@ import java.nio.ByteOrder;
 
 public class GridEyeDriver {
 
+
     private PeripheralManager mManager;
     private I2cDevice i2cDevice;
 
@@ -35,7 +36,10 @@ public class GridEyeDriver {
         i2cDevice = mManager.openI2cDevice(i2CName, address);
     }
 
-    public void close() throws IOException {
+    public void close() throws IOException, GridEyeDriverErrorException {
+        if (i2cDevice == null) {
+            throw new GridEyeDriverErrorException("GridEyeDevice can not close before device open.");
+        }
         i2cDevice.close();
     }
 
