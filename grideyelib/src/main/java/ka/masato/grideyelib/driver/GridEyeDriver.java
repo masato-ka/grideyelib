@@ -5,7 +5,6 @@ import com.google.android.things.pio.PeripheralManager;
 import ka.masato.grideyelib.driver.enums.FrameRate;
 import ka.masato.grideyelib.driver.enums.IntruptMode;
 import ka.masato.grideyelib.driver.exception.GridEyeDriverErrorException;
-import ka.masato.grideyelib.driver.exception.GridEyeDriverErrorExceptions;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -214,7 +213,7 @@ public class GridEyeDriver {
 
     private short getShortFromTwelveBit(byte[] value) {
         if (value.length != 2) {
-            throw new GridEyeDriverErrorExceptions("Value should be 2 byte length.");
+            throw new GridEyeDriverErrorException("Value should be 2 byte length.");
         }
 
         if ((value[0] & 0x08) == 0x08) {
