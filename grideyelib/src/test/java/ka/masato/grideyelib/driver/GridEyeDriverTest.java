@@ -15,7 +15,7 @@ import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class GridEyeDriverTest {
@@ -296,6 +296,7 @@ public class GridEyeDriverTest {
 
         doReturn((byte) 0xFF).when(mockI2cDevice).readRegByte(0x03);
         IntruptMode actual = target.getInterruptMode();
+        target.close();
         fail();
     }
 
@@ -308,35 +309,216 @@ public class GridEyeDriverTest {
 
         doThrow(new IOException()).when(mockI2cDevice).readRegByte(0x03);
         IntruptMode actual = target.getInterruptMode();
+        target.close();
         fail();
     }
 
     @Test
-    public void getStatusRegister() {
+    public void getStatusRegisterTest01() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        doReturn((byte) 0x00).when(mockI2cDevice).readRegByte(0x04);
+        byte value = target.getStatusRegister();
+        assertEquals(0x00, value);
+        target.close();
+    }
+
+    @Test(expected = IOException.class)
+    public void getStatusRegisterTestAbnormal01() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        doThrow(new IOException()).when(mockI2cDevice).readRegByte(0x04);
+        byte value = target.getStatusRegister();
+        assertEquals(0x00, value);
+        target.close();
     }
 
     @Test
-    public void clearRegister() {
+    public void clearRegisterTest01() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        doNothing().when(mockI2cDevice).writeRegByte(0x05, (byte) 0x00);
+        target.clearRegister(false, false, false);
+        verify(mockI2cDevice).writeRegByte(0x05, (byte) 0x00);
+        target.close();
     }
 
     @Test
-    public void enableTwiveMovingAverageMode() {
+    public void clearRegisterTest02() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        doNothing().when(mockI2cDevice).writeRegByte(0x05, (byte) 0x04);
+        target.clearRegister(true, false, false);
+        verify(mockI2cDevice).writeRegByte(0x05, (byte) 0x04);
+        target.close();
     }
 
     @Test
-    public void disableTwiceMovingAverageMode() {
+    public void clearRegisterTest03() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        doNothing().when(mockI2cDevice).writeRegByte(0x05, (byte) 0x04);
+        target.clearRegister(false, true, false);
+        verify(mockI2cDevice).writeRegByte(0x05, (byte) 0x02);
+        target.close();
     }
 
     @Test
-    public void setAverageMode() {
+    public void clearRegisterTest04() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        doNothing().when(mockI2cDevice).writeRegByte(0x05, (byte) 0x04);
+        target.clearRegister(true, true, false);
+        verify(mockI2cDevice).writeRegByte(0x05, (byte) 0x06);
+        target.close();
     }
 
     @Test
-    public void isTwiceMovingAverageModeEnable() {
+    public void clearRegisterTest05() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        doNothing().when(mockI2cDevice).writeRegByte(0x05, (byte) 0x04);
+        target.clearRegister(false, false, true);
+        verify(mockI2cDevice).writeRegByte(0x05, (byte) 0x01);
+        target.close();
     }
 
     @Test
-    public void setInterruptLevel() {
+    public void clearRegisterTest06() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        doNothing().when(mockI2cDevice).writeRegByte(0x05, (byte) 0x04);
+        target.clearRegister(false, true, true);
+        verify(mockI2cDevice).writeRegByte(0x05, (byte) 0x03);
+        target.close();
+    }
+
+    @Test
+    public void clearRegisterTest07() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        doNothing().when(mockI2cDevice).writeRegByte(0x05, (byte) 0x04);
+        target.clearRegister(true, true, true);
+        verify(mockI2cDevice).writeRegByte(0x05, (byte) 0x07);
+        target.close();
+    }
+
+    @Test(expected = IOException.class)
+    public void clearRegisterTestAbnormal01() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        doThrow(new IOException()).when(mockI2cDevice).writeRegByte(0x05, (byte) 0x07);
+        target.clearRegister(true, true, true);
+        target.close();
+    }
+
+    @Test
+    public void enableTwiceMovingAverageModeTest01() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        doNothing().when(mockI2cDevice).writeRegByte(0x05, (byte) 0x07);
+        target.enableTwiceMovingAverageMode();
+        verify(mockI2cDevice, times(1)).writeRegByte(0x1F, (byte) 0x50);
+        verify(mockI2cDevice, times(1)).writeRegByte(0x1F, (byte) 0x45);
+        verify(mockI2cDevice, times(1)).writeRegByte(0x1F, (byte) 0x57);
+        verify(mockI2cDevice, times(1)).writeRegByte(0x07, (byte) 0x20);
+        verify(mockI2cDevice, times(1)).writeRegByte(0x1F, (byte) 0x00);
+        target.close();
+    }
+
+    @Test(expected = IOException.class)
+    public void enableTwiceMovingAverageModeTestAbnormal01() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        doThrow(new IOException()).when(mockI2cDevice).writeRegByte(0x07, (byte) 0x20);
+        target.enableTwiceMovingAverageMode();
+        target.close();
+
+    }
+
+    @Test
+    public void disableTwiceMovingAverageModeTest01() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        doNothing().when(mockI2cDevice).writeRegByte(0x05, (byte) 0x07);
+        target.disableTwiceMovingAverageMode();
+        verify(mockI2cDevice, times(1)).writeRegByte(0x1F, (byte) 0x50);
+        verify(mockI2cDevice, times(1)).writeRegByte(0x1F, (byte) 0x45);
+        verify(mockI2cDevice, times(1)).writeRegByte(0x1F, (byte) 0x57);
+        verify(mockI2cDevice, times(1)).writeRegByte(0x07, (byte) 0x00);
+        verify(mockI2cDevice, times(1)).writeRegByte(0x1F, (byte) 0x00);
+        target.close();
+
+    }
+
+    @Test(expected = IOException.class)
+    public void disableTwiceMovingAverageModeTestAbnormal01() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        doThrow(new IOException()).when(mockI2cDevice).writeRegByte(0x07, (byte) 0x00);
+        target.disableTwiceMovingAverageMode();
+        target.close();
+    }
+
+    @Test
+    public void isTwiceMovingAverageModeEnableTest01() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        doReturn((byte) 0x20).when(mockI2cDevice).readRegByte(0x07);
+        boolean result = target.isTwiceMovingAverageModeEnable();
+        assertTrue(result);
+        target.close();
+    }
+
+    @Test
+    public void isTwiceMovingAverageModeEnableTest02() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        doReturn((byte) 0x00).when(mockI2cDevice).readRegByte(0x07);
+        boolean result = target.isTwiceMovingAverageModeEnable();
+        assertTrue(!result);
+        target.close();
+    }
+
+    @Test(expected = GridEyeDriverErrorException.class)
+    public void isTwiceMovingAverageModeEnableTestAbnormal01() throws IOException, GridEyeDriverErrorException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        doReturn((byte) 0x01).when(mockI2cDevice).readRegByte(0x07);
+        boolean result = target.isTwiceMovingAverageModeEnable();
+        fail();
+    }
+
+    @Test(expected = IOException.class)
+    public void isTwiceMovingAverageModeEnableTestAbnormal02() throws IOException, GridEyeDriverErrorException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        doThrow(new IOException()).when(mockI2cDevice).readRegByte(0x07);
+        boolean result = target.isTwiceMovingAverageModeEnable();
+        fail();
+    }
+
+    @Test
+    public void setInterruptLevel() throws IOException {
+
     }
 
     @Test

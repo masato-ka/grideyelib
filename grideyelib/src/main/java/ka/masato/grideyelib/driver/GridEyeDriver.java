@@ -106,7 +106,7 @@ public class GridEyeDriver {
     }
 
 
-    public void enableTwiveMovingAverageMode() throws IOException {
+    public void enableTwiceMovingAverageMode() throws IOException {
         setAverageMode(true);
     }
 
@@ -114,7 +114,7 @@ public class GridEyeDriver {
         setAverageMode(false);
     }
 
-    public void setAverageMode(boolean toggle) throws IOException {
+    private void setAverageMode(boolean toggle) throws IOException {
         byte value = toggle ? (byte) 0x20 : 0x00;
         i2cDevice.writeRegByte((byte) 0x1F, (byte) 0x50);
         i2cDevice.writeRegByte((byte) 0x1F, (byte) 0x45);
@@ -125,6 +125,9 @@ public class GridEyeDriver {
 
     public boolean isTwiceMovingAverageModeEnable() throws IOException {
         byte ret = i2cDevice.readRegByte(0x07);
+        if (ret != (byte) 0x20 && ret != (byte) 0x00) {
+            throw new GridEyeDriverErrorException("Illigal TwiceMovingAverageMode Register value.");
+        }
         return ret == (byte) 0x20;
     }
 
