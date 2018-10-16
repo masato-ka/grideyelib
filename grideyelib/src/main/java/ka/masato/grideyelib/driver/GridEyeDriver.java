@@ -62,6 +62,9 @@ public class GridEyeDriver {
 
     public FrameRate getFrameRate() throws IOException {
         byte result = i2cDevice.readRegByte(0x02);
+        if (FrameRate.FRAMERATE_ONE.getValue() != result && FrameRate.FRAMERATE_TEN.getValue() != result) {
+            throw new GridEyeDriverErrorException("GridEye returned illigal parameter. frameRate is " + result);
+        }
         return FrameRate.FRAMERATE_TEN.getValue() == (int) result ?
                 FrameRate.FRAMERATE_TEN : FrameRate.FRAMERATE_ONE;
     }
@@ -71,18 +74,19 @@ public class GridEyeDriver {
     }
 
     public IntruptMode getInterruptMode() throws IOException {
-        byte result = i2cDevice.readRegByte(0x03);
-        if (IntruptMode.ABSOLUTE_VALUE_INT_ACTIVE.getValue() == result) {
-            return IntruptMode.ABSOLUTE_VALUE_INT_ACTIVE;
-        }
-        if (IntruptMode.ABSOLUTE_VALUE_INT_DEACTIVE.getValue() == result) {
-            return IntruptMode.ABSOLUTE_VALUE_INT_DEACTIVE;
-        }
-        if (IntruptMode.DIFFERENT_INT_ACTIVE.getValue() == result) {
-            return IntruptMode.DIFFERENT_INT_ACTIVE;
-        }
-        return IntruptMode.DIFFERENT_INT_DEACTIVE;
 
+        byte ret = i2cDevice.readRegByte(0x03);
+        IntruptMode[] types = IntruptMode.values();
+        IntruptMode result = null;
+        for (IntruptMode type : types) {
+            if (type.getValue() == ret) {
+                result = type;
+            }
+        }
+        if (result == null) {
+            throw new GridEyeDriverErrorException("GridEye returned illigal parameter. frameRate is " + ret);
+        }
+        return result;
     }
 
 
