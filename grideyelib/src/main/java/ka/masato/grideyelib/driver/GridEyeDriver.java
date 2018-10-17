@@ -131,7 +131,7 @@ public class GridEyeDriver {
         return ret == (byte) 0x20;
     }
 
-    public void setInterruptLevel(short intHighLevel, short intLowLevel, short hstLevel)
+    public void setInterruptLevel(float intHighLevel, float intLowLevel, float hstLevel)
             throws GridEyeDriverErrorException, IOException {
 
         if (validateTempratureLimit(intHighLevel)) {
@@ -147,9 +147,9 @@ public class GridEyeDriver {
         }
 
         ByteBuffer payload = ByteBuffer.allocate(6);
-        payload.put(getTwelveBitFromShort(intHighLevel));
-        payload.put(getTwelveBitFromShort(intLowLevel));
-        payload.put(getTwelveBitFromShort(hstLevel));
+        payload.put(getTwelveBitFromShort((short) (intHighLevel / 0.25)));
+        payload.put(getTwelveBitFromShort((short) (intLowLevel / 0.25)));
+        payload.put(getTwelveBitFromShort((short) (hstLevel / 0.25)));
 
         i2cDevice.writeRegBuffer(0x08, payload.array(), payload.array().length);
 
@@ -204,9 +204,9 @@ public class GridEyeDriver {
     }
 
 
-    private boolean validateTempratureLimit(short value) {
+    private boolean validateTempratureLimit(float value) {
         //AMG8833 is below temprature range.
-        return !(0.000 >= value || value >= 80.000);
+        return 0.000 > value || value > 80.000;
 
     }
 

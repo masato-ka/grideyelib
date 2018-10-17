@@ -36,6 +36,7 @@ public class GridEyeDriverTest {
 
     @After
     public void tearDown() throws Exception, GridEyeDriverErrorException {
+
     }
 
     @Test
@@ -517,8 +518,68 @@ public class GridEyeDriverTest {
     }
 
     @Test
-    public void setInterruptLevel() throws IOException {
+    public void setInterruptLevelTest01() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        target.setInterruptLevel(80, 80, 80);
 
+        byte[] expected = {0x01, 0x40, 0x01, 0x40, 0x01, 0x40};
+        verify(mockI2cDevice).writeRegBuffer(0x08, expected, expected.length);
+        target.close();
+
+    }
+
+    @Test
+    public void setInterruptLevelTest02() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        target.setInterruptLevel(0, 0, 0);
+        byte[] expected = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        verify(mockI2cDevice).writeRegBuffer(0x08, expected, expected.length);
+        target.close();
+    }
+
+    @Test(expected = GridEyeDriverErrorException.class)
+    public void setInterruptLevelTestAbnormal01() throws IOException, GridEyeDriverErrorException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        target.setInterruptLevel(100, 0, 0);
+
+        target.close();
+    }
+
+    @Test(expected = GridEyeDriverErrorException.class)
+    public void setInterruptLevelTestAbnormal02() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        target.setInterruptLevel(0, 100, 0);
+
+        target.close();
+    }
+
+    @Test(expected = GridEyeDriverErrorException.class)
+    public void setInterruptLevelTestAbnormal03() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        target.setInterruptLevel(0, 0, 100);
+
+        target.close();
+    }
+
+    @Test(expected = IOException.class)
+    public void setInterruptLevelTestAbnormal04() throws IOException {
+        target.setmPeripheralManager(mockPeripheralManager);
+        doReturn(mockI2cDevice).when(mockPeripheralManager).openI2cDevice("I2C1", 0x68);
+        target.open("I2C1", 0x68);
+        byte[] payload = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        doThrow(new IOException()).when(mockI2cDevice).writeRegBuffer(0x08, payload, payload.length);
+        target.setInterruptLevel(0, 0, 0);
+        target.close();
     }
 
     @Test
