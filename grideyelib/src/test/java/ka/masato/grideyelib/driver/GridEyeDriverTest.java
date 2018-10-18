@@ -10,8 +10,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -355,26 +358,331 @@ public class GridEyeDriverTest {
     }
 
     @Test
-    public void getIntHightLevel() {
+    public void getIntHightLevelTest01() throws IOException {
+        byte[] expect = {0x00, 0x00};
+
+        doAnswer(new Answer<byte[]>() {
+            @Override
+            public byte[] answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                if (args[1] instanceof byte[]) {
+                    byte[] result = (byte[]) args[1];
+                    result[0] = 0x00;
+                }
+                return null;
+            }
+        }).when(mockI2cDevice).readRegBuffer(0x08, expect, 2);
+        double result = target.getIntHightLevel();
+        assertThat(result, is(0.0));
     }
 
     @Test
-    public void getIntLowLevel() {
+    public void getIntHightLevelTest02() throws IOException {
+        byte[] expect = {0x00, 0x00};
+
+        doAnswer(new Answer<byte[]>() {
+            @Override
+            public byte[] answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                if (args[1] instanceof byte[]) {
+                    byte[] result = (byte[]) args[1];
+                    result[0] = 0x0F;
+                    result[1] = (byte) 0xFF;
+                }
+                return null;
+            }
+        }).when(mockI2cDevice).readRegBuffer(0x08, expect, 2);
+        double result = target.getIntHightLevel();
+        assertThat(result, is(-0.25));
     }
 
     @Test
-    public void getHstLevel() {
+    public void getIntHightLevelTest03() throws IOException {
+        byte[] expect = {0x00, 0x00};
+
+        doAnswer(new Answer<byte[]>() {
+            @Override
+            public byte[] answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                if (args[1] instanceof byte[]) {
+                    byte[] result = (byte[]) args[1];
+                    result[0] = 0x00;
+                    result[1] = (byte) 0x64;
+                }
+                return null;
+            }
+        }).when(mockI2cDevice).readRegBuffer(0x08, expect, 2);
+        double result = target.getIntHightLevel();
+        assertThat(result, is(25.0));
+    }
+
+    @Test(expected = IOException.class)
+    public void getIntHightLevelTestAbnormal01() throws IOException {
+        doThrow(new IOException()).when(mockI2cDevice).readRegBuffer(0x08, new byte[]{0x00, 0x00}, 2);
+        double result = target.getIntHightLevel();
     }
 
     @Test
-    public void getThermisterTemplature() {
+    public void getIntLowLevelTest01() throws IOException {
+        byte[] expect = {0x00, 0x00};
+
+        doAnswer(new Answer<byte[]>() {
+            @Override
+            public byte[] answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                if (args[1] instanceof byte[]) {
+                    byte[] result = (byte[]) args[1];
+                    result[0] = 0x00;
+                    result[1] = (byte) 0x00;
+                }
+                return null;
+            }
+        }).when(mockI2cDevice).readRegBuffer(0x0A, expect, 2);
+        double result = target.getIntLowLevel();
+        assertThat(result, is(0.0));
     }
 
     @Test
-    public void getInterruptedPixels() {
+    public void getIntLowLevelTest02() throws IOException {
+        byte[] expect = {0x00, 0x00};
+
+        doAnswer(new Answer<byte[]>() {
+            @Override
+            public byte[] answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                if (args[1] instanceof byte[]) {
+                    byte[] result = (byte[]) args[1];
+                    result[0] = 0x0F;
+                    result[1] = (byte) 0xFF;
+                }
+                return null;
+            }
+        }).when(mockI2cDevice).readRegBuffer(0x0A, expect, 2);
+        double result = target.getIntLowLevel();
+        assertThat(result, is(-0.25));
     }
 
     @Test
-    public void getTemperatures() {
+    public void getIntLowLevelTest03() throws IOException {
+        byte[] expect = {0x00, 0x00};
+
+        doAnswer(new Answer<byte[]>() {
+            @Override
+            public byte[] answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                if (args[1] instanceof byte[]) {
+                    byte[] result = (byte[]) args[1];
+                    result[0] = 0x00;
+                    result[1] = (byte) 0x64;
+                }
+                return null;
+            }
+        }).when(mockI2cDevice).readRegBuffer(0x0A, expect, 2);
+        double result = target.getIntLowLevel();
+        assertThat(result, is(25.0));
     }
+
+    @Test(expected = IOException.class)
+    public void getIntLowLevelTestAbnormal01() throws IOException {
+        doThrow(new IOException()).when(mockI2cDevice).readRegBuffer(0x0A, new byte[]{0x00, 0x00}, 2);
+        double result = target.getIntLowLevel();
+    }
+
+    @Test
+    public void getHstLevelTest01() throws IOException {
+        byte[] expect = {0x00, 0x00};
+
+        doAnswer(new Answer<byte[]>() {
+            @Override
+            public byte[] answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                if (args[1] instanceof byte[]) {
+                    byte[] result = (byte[]) args[1];
+                    result[0] = 0x00;
+                    result[1] = (byte) 0x00;
+                }
+                return null;
+            }
+        }).when(mockI2cDevice).readRegBuffer(0x0C, expect, 2);
+        double result = target.getHstLevel();
+        assertThat(result, is(0.0));
+    }
+
+    @Test
+    public void getHstLevelTest02() throws IOException {
+        byte[] expect = {0x00, 0x00};
+
+        doAnswer(new Answer<byte[]>() {
+            @Override
+            public byte[] answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                if (args[1] instanceof byte[]) {
+                    byte[] result = (byte[]) args[1];
+                    result[0] = 0x0F;
+                    result[1] = (byte) 0xFF;
+                }
+                return null;
+            }
+        }).when(mockI2cDevice).readRegBuffer(0x0C, expect, 2);
+        double result = target.getHstLevel();
+        assertThat(result, is(-0.25));
+    }
+
+    @Test
+    public void getHstLevelTest03() throws IOException {
+        byte[] expect = {0x00, 0x00};
+
+        doAnswer(new Answer<byte[]>() {
+            @Override
+            public byte[] answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                if (args[1] instanceof byte[]) {
+                    byte[] result = (byte[]) args[1];
+                    result[0] = 0x00;
+                    result[1] = (byte) 0x64;
+                }
+                return null;
+            }
+        }).when(mockI2cDevice).readRegBuffer(0x0C, expect, 2);
+        double result = target.getHstLevel();
+        assertThat(result, is(25.0));
+    }
+
+    @Test(expected = IOException.class)
+    public void getHstLevelTestAbnormal01() throws IOException {
+        doThrow(new IOException()).when(mockI2cDevice).readRegBuffer(0x0C, new byte[]{0x00, 0x00}, 2);
+        double result = target.getHstLevel();
+    }
+
+    @Test
+    public void getThermisterTemplatureTest01() throws IOException {
+
+        doAnswer(new Answer<byte[]>() {
+            @Override
+            public byte[] answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                if (args[1] instanceof byte[]) {
+                    byte[] result = (byte[]) args[1];
+                    result[0] = 0x00;
+                    result[1] = (byte) 0x00;
+                }
+                return null;
+            }
+        }).when(mockI2cDevice).readRegBuffer(0x0E, new byte[]{0x00, 0x00}, 2);
+
+        double result = target.getThermisterTemplature();
+        assertThat(result, is(0.0));
+    }
+
+    @Test
+    public void getThermisterTemplatureTest02() throws IOException {
+
+        doAnswer(new Answer<byte[]>() {
+            @Override
+            public byte[] answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                if (args[1] instanceof byte[]) {
+                    byte[] result = (byte[]) args[1];
+                    result[0] = (byte) 0x07;
+                    result[1] = (byte) 0xFF;
+                }
+                return null;
+            }
+        }).when(mockI2cDevice).readRegBuffer(0x0E, new byte[]{0x00, 0x00}, 2);
+
+        double result = target.getThermisterTemplature();
+        assertThat(result, is(127.9375));
+    }
+
+    @Test
+    public void getThermisterTemplatureTest03() throws IOException {
+
+        doAnswer(new Answer<byte[]>() {
+            @Override
+            public byte[] answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                if (args[1] instanceof byte[]) {
+                    byte[] result = (byte[]) args[1];
+                    result[0] = (byte) 0x0F;
+                    result[1] = (byte) 0xFC;
+                }
+                return null;
+            }
+        }).when(mockI2cDevice).readRegBuffer(0x0E, new byte[]{0x00, 0x00}, 2);
+
+        double result = target.getThermisterTemplature();
+        assertThat(result, is(-0.25));
+    }
+
+    @Test(expected = IOException.class)
+    public void getThermisterTestAbnormal01() throws IOException {
+        doThrow(new IOException()).when(mockI2cDevice).readRegBuffer(0x0E, new byte[]{0x00, 0x00}, 2);
+        double result = target.getThermisterTemplature();
+    }
+
+    @Test
+    public void getInterruptedPixelsTest01() throws IOException {
+        doAnswer(new Answer<byte[]>() {
+            @Override
+            public byte[] answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                if (args[1] instanceof byte[]) {
+                    byte[] result = (byte[]) args[1];
+                    result[0] = (byte) 0xFF;
+                    result[1] = (byte) 0xFF;
+                    result[2] = (byte) 0xFF;
+                    result[3] = (byte) 0xFF;
+                    result[4] = (byte) 0xFF;
+                    result[5] = (byte) 0xFF;
+                    result[6] = (byte) 0xFF;
+                    result[7] = (byte) 0xFF;
+                }
+                return null;
+            }
+        }).when(mockI2cDevice).readRegBuffer(0x10, new byte[8], 8);
+
+        byte[] result = target.getInterruptedPixels();
+        Arrays.equals(result, new byte[]{(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+                (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,});
+    }
+
+    @Test(expected = IOException.class)
+    public void getInterruptedPixelsTestAbnormal01() throws IOException {
+        doThrow(new IOException()).when(mockI2cDevice).readRegBuffer(0x10, new byte[8], 8);
+
+        byte[] result = target.getInterruptedPixels();
+    }
+
+    @Test
+    public void getTemperaturesTest01() throws IOException {
+        doAnswer(new Answer<byte[]>() {
+            @Override
+            public byte[] answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                if (args[1] instanceof byte[]) {
+                    byte[] result = (byte[]) args[1];
+                    for (int i = 0; i < result.length; i++) {
+                        result[i] = 0x00;
+                    }
+
+                }
+                return null;
+            }
+        }).when(mockI2cDevice).readRegBuffer(0x10, new byte[128], 8);
+
+        short[] result = target.getTemperatures();
+
+        short[] expect = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        Arrays.equals(result, expect);
+    }
+
+    @Test(expected = IOException.class)
+    public void getTemperaturesTestAbnormal01() throws IOException {
+        doThrow(new IOException()).when(mockI2cDevice).readRegBuffer(0x80, new byte[128], 128);
+        target.getTemperatures();
+    }
+
 }

@@ -131,7 +131,7 @@ public class GridEyeDriver {
         return ret == (byte) 0x20;
     }
 
-    public void setInterruptLevel(float intHighLevel, float intLowLevel, float hstLevel)
+    public void setInterruptLevel(double intHighLevel, double intLowLevel, double hstLevel)
             throws GridEyeDriverErrorException, IOException {
 
         if (validateTempratureLimit(intHighLevel)) {
@@ -204,7 +204,7 @@ public class GridEyeDriver {
     }
 
 
-    private boolean validateTempratureLimit(float value) {
+    private boolean validateTempratureLimit(double value) {
         //AMG8833 is below temprature range.
         return 0.000 > value || value > 80.000;
 
