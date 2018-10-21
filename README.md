@@ -91,7 +91,7 @@ mUserDriverManager.unregisterSensor(userSensor);
 
 ## Version
       
-* 2018/10/xx  Version x.x.x
+* 2018/10/21  Version 1.0.0
      
 
 ## Author

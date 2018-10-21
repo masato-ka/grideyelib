@@ -9,6 +9,10 @@ import java.io.IOException;
 
 public class GridEyeManager {
 
+    private static final String DRIVER_NAME = "GridEYESensorDriver";
+    private static final String VENDOR_NAME = "masato-ka";
+    private static final String STRING_TYPE = "ka.masato.grideye";
+
     private GridEyeDriver gridEyeDriver;
     private GridEyeUserSensorDriver customUserSensorDriver;
 
@@ -31,10 +35,11 @@ public class GridEyeManager {
 
         customUserSensorDriver = new GridEyeUserSensorDriver(gridEyeDriver);
 
-        return new UserSensor.Builder().setName("MySensor")
-                .setVendor("MyCompany")
+        return new UserSensor.Builder().setName(DRIVER_NAME)
+                .setVendor(VENDOR_NAME)
+                .setVersion(1)
                 .setCustomType(Sensor.TYPE_DEVICE_PRIVATE_BASE,
-                        "ka.masato.grideye",
+                        STRING_TYPE,
                         Sensor.REPORTING_MODE_CONTINUOUS)
                 .setDriver(customUserSensorDriver)
                 .build();
