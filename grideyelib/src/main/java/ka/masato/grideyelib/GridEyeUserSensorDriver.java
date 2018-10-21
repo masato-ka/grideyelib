@@ -19,7 +19,8 @@ public class GridEyeUserSensorDriver implements UserSensorDriver {
     @Override
     public UserSensorReading read() throws IOException {
         float[] temperatures = gridEyeDriver.getTemperatures();
-        return new UserSensorReading(temperatures);
+        UserSensorReading result = new UserSensorReading(temperatures);
+        return result;
     }
 
     @Override

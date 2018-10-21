@@ -1,6 +1,7 @@
 package ka.masato.sample;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -17,8 +18,9 @@ public class MainActivity extends Activity implements SensorEventListener {
         @Override
         public void onDynamicSensorConnected(Sensor sensor) {
             super.onDynamicSensorConnected(sensor);
-            sensorManager.registerListener(MainActivity.this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
-
+            if (sensor.getName() == "GridEYESensorDriver") {
+                sensorManager.registerListener(MainActivity.this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+            }
         }
 
         @Override
@@ -32,6 +34,9 @@ public class MainActivity extends Activity implements SensorEventListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        startService(new Intent(this, SensorDrierService.class));
+
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         sensorManager.registerDynamicSensorCallback(mCallback);
     }
@@ -39,13 +44,13 @@ public class MainActivity extends Activity implements SensorEventListener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        sensorManager.unregisterDynamicSensorCallback(mCallback);
+        stopService(new Intent(this, SensorDrierService.class));
     }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-
-        Log.i(TAG, "value: " + sensorEvent.values.toString());
-
+        Log.d(TAG, "RESULT :" + sensorEvent.values.toString());
     }
 
     @Override
