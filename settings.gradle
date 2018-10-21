@@ -1,1 +1,1 @@
-include ':app', ':grideyelib', ':grideyelib'
+include ':app', ':grideyelib', ':grideyelib', ':sample'
