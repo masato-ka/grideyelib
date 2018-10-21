@@ -324,7 +324,7 @@ public class GridEyeDriverTest {
     @Test
     public void setInterruptLevelTest01() throws IOException {
         target.setInterruptLevel(80, 80, 80);
-        byte[] expected = {0x01, 0x40, 0x01, 0x40, 0x01, 0x40};
+        byte[] expected = {0x40, 0x01, 0x40, 0x01, 0x40, 0x01};
         verify(mockI2cDevice).writeRegBuffer(0x08, expected, expected.length);
     }
 
@@ -386,8 +386,8 @@ public class GridEyeDriverTest {
                 Object[] args = invocation.getArguments();
                 if (args[1] instanceof byte[]) {
                     byte[] result = (byte[]) args[1];
-                    result[0] = 0x0F;
-                    result[1] = (byte) 0xFF;
+                    result[1] = 0x0F;
+                    result[0] = (byte) 0xFF;
                 }
                 return null;
             }
@@ -406,8 +406,8 @@ public class GridEyeDriverTest {
                 Object[] args = invocation.getArguments();
                 if (args[1] instanceof byte[]) {
                     byte[] result = (byte[]) args[1];
-                    result[0] = 0x00;
-                    result[1] = (byte) 0x64;
+                    result[1] = 0x00;
+                    result[0] = (byte) 0x64;
                 }
                 return null;
             }
@@ -452,8 +452,8 @@ public class GridEyeDriverTest {
                 Object[] args = invocation.getArguments();
                 if (args[1] instanceof byte[]) {
                     byte[] result = (byte[]) args[1];
-                    result[0] = 0x0F;
-                    result[1] = (byte) 0xFF;
+                    result[1] = 0x0F;
+                    result[0] = (byte) 0xFF;
                 }
                 return null;
             }
@@ -472,8 +472,8 @@ public class GridEyeDriverTest {
                 Object[] args = invocation.getArguments();
                 if (args[1] instanceof byte[]) {
                     byte[] result = (byte[]) args[1];
-                    result[0] = 0x00;
-                    result[1] = (byte) 0x64;
+                    result[1] = 0x00;
+                    result[0] = (byte) 0x64;
                 }
                 return null;
             }
@@ -518,8 +518,8 @@ public class GridEyeDriverTest {
                 Object[] args = invocation.getArguments();
                 if (args[1] instanceof byte[]) {
                     byte[] result = (byte[]) args[1];
-                    result[0] = 0x0F;
-                    result[1] = (byte) 0xFF;
+                    result[1] = 0x0F;
+                    result[0] = (byte) 0xFF;
                 }
                 return null;
             }
@@ -538,8 +538,8 @@ public class GridEyeDriverTest {
                 Object[] args = invocation.getArguments();
                 if (args[1] instanceof byte[]) {
                     byte[] result = (byte[]) args[1];
-                    result[0] = 0x00;
-                    result[1] = (byte) 0x64;
+                    result[1] = 0x00;
+                    result[0] = (byte) 0x64;
                 }
                 return null;
             }
@@ -583,8 +583,8 @@ public class GridEyeDriverTest {
                 Object[] args = invocation.getArguments();
                 if (args[1] instanceof byte[]) {
                     byte[] result = (byte[]) args[1];
-                    result[0] = (byte) 0x07;
-                    result[1] = (byte) 0xFF;
+                    result[1] = (byte) 0x07;
+                    result[0] = (byte) 0xFF;
                 }
                 return null;
             }
@@ -603,8 +603,8 @@ public class GridEyeDriverTest {
                 Object[] args = invocation.getArguments();
                 if (args[1] instanceof byte[]) {
                     byte[] result = (byte[]) args[1];
-                    result[0] = (byte) 0x0F;
-                    result[1] = (byte) 0xFC;
+                    result[1] = (byte) 0x0F;
+                    result[0] = (byte) 0xFC;
                 }
                 return null;
             }
@@ -668,11 +668,11 @@ public class GridEyeDriverTest {
                 }
                 return null;
             }
-        }).when(mockI2cDevice).readRegBuffer(0x10, new byte[128], 8);
+        }).when(mockI2cDevice).readRegBuffer(0x10, new byte[32], 32);
 
-        short[] result = target.getTemperatures();
+        float[] result = target.getTemperatures();
 
-        short[] expect = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        float[] expect = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -681,7 +681,7 @@ public class GridEyeDriverTest {
 
     @Test(expected = IOException.class)
     public void getTemperaturesTestAbnormal01() throws IOException {
-        doThrow(new IOException()).when(mockI2cDevice).readRegBuffer(0x80, new byte[128], 128);
+        doThrow(new IOException()).when(mockI2cDevice).readRegBuffer(0x80, new byte[32], 32);
         target.getTemperatures();
     }
 

@@ -1,2 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="ka.masato.library.device.grideyelib"/>
+          package="ka.masato.library.device.grideyelib">
+
+    <uses-permission android:name="com.google.android.things.permission.MANAGE_SENSOR_DRIVERS"/>
+    <uses-permission android:name="com.google.android.things.permission.USE_PERIPHERAL_IO"/>
+
+    <application>
+        <uses-library android:name="com.google.android.things"/>
+    </application>
+
+</manifest>

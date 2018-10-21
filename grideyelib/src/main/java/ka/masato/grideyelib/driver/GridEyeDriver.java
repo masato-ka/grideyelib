@@ -186,18 +186,22 @@ public class GridEyeDriver {
         return result;
     }
 
-    public short[] getTemperatures() throws IOException {
-        byte[] buffer = new byte[64 * 2];
-        i2cDevice.readRegBuffer(0x80, buffer, buffer.length);
-        short[] results = new short[64];
+    public float[] getTemperatures() throws IOException {
 
-        ByteBuffer bb = ByteBuffer.wrap(buffer).order(ByteOrder.BIG_ENDIAN);
+        ByteBuffer bb = ByteBuffer.allocate(8 * 8 * 2).order(ByteOrder.LITTLE_ENDIAN);
+
+        for (int i = 1; i <= 4; i++) {
+            byte[] buffer = new byte[32 * 1];
+            i2cDevice.readRegBuffer(0x80, buffer, 32);
+            bb.put(buffer);
+        }
+
+        float[] results = new float[64];
         byte[] twoByteBuffer = new byte[2];
-
         for (int i = 0; i < 64; i++) {
             bb.position(i * 2).limit((i * 2) + 2);
             bb.get(twoByteBuffer);
-            results[i] = getShortFromTwelveBit(twoByteBuffer);
+            results[i] = (float) ((float) getShortFromTwelveBit(twoByteBuffer) * 0.25);
         }
 
         return results;
@@ -211,10 +215,10 @@ public class GridEyeDriver {
     }
 
     private byte[] getTwelveBitFromShort(short value) {
-        ByteBuffer bb = ByteBuffer.allocate(2).order(ByteOrder.BIG_ENDIAN);
+        ByteBuffer bb = ByteBuffer.allocate(2).order(ByteOrder.LITTLE_ENDIAN);
         bb.putShort(value);
         byte[] result = bb.array();
-        result[0] &= 0x0F;
+        result[1] &= 0x0F;
         return result;
     }
 
@@ -223,10 +227,10 @@ public class GridEyeDriver {
             throw new GridEyeDriverErrorException("Value should be 2 byte length.");
         }
 
-        if ((value[0] & 0x08) == 0x08) {
-            value[0] |= 0xF0;
+        if ((value[1] & 0x08) == 0x08) {
+            value[1] |= 0xF0;
         }
-        return ByteBuffer.wrap(value).order(ByteOrder.BIG_ENDIAN).getShort();
+        return ByteBuffer.wrap(value).order(ByteOrder.LITTLE_ENDIAN).getShort();
     }
 
 
