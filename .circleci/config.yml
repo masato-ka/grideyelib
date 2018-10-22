@@ -58,6 +58,8 @@ workflows:
         filters:
           branches:
             only: /.*/
+          tags:
+            ignore: /.*/
   build_and_test_release:
     jobs:
     - build:
