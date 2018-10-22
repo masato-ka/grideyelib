@@ -38,7 +38,6 @@ jobs:
         path: grideyelib/build/test-results
 
   hoge:
-    type:
     docker:
     - image: circleci/android:api-28-alpha
     environment:
@@ -46,10 +45,11 @@ jobs:
       TERM: dumb
     steps:
     - checkout
+    # Download and cache dependencies
     - restore_cache:
-      keys:
-      - v1-dependencies-{{ checksum "build.gradle" }}-{{ checksum  "grideyelib/build.gradle" }}
-      - v1-dependencies-
+        keys:
+        - v1-dependencies-{{ checksum "build.gradle" }}-{{ checksum  "grideyelib/build.gradle" }}
+        - v1-dependencies-
     - run:
         name: gradle dependencies
         command: ./gradlew androidDependencies
@@ -81,17 +81,17 @@ workflows:
   build_and_test:
     jobs:
     - build:
-      filters:
-        branches:
-          only: /.*/
+        filters:
+          branches:
+            only: /.*/
   build_and_test_release:
     jobs:
     - hoge:
-      filters:
-        tags:
-          only: /^v.*/
-        branches:
-          ignore: /.*/
+        filters:
+          tags:
+            only: /^v.*/
+          branches:
+            ignore: /.*/
 
 
 
