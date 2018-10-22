@@ -37,7 +37,7 @@ jobs:
     - store_artifacts:
         path: grideyelib/build/test-results
 
-  hoge:
+  release:
     docker:
     - image: circleci/android:api-28-alpha
     environment:
@@ -86,7 +86,7 @@ workflows:
             only: /.*/
   build_and_test_release:
     jobs:
-    - hoge:
+    - release:
         filters:
           tags:
             only: /^v.*/
