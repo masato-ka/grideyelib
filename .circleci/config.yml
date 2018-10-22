@@ -12,7 +12,6 @@ jobs:
       TERM: dumb
     steps:
     - checkout
-
     # Download and cache dependencies
     - restore_cache:
         keys:
@@ -84,7 +83,7 @@ workflows:
     - build_and_test
       filters:
         branches:
-          only:  /.*/
+          only: /.*/
   release:
     jobs:
     - release
