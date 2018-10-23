@@ -5,7 +5,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 
 def versionMajor = 0
 def versionMinor = 6
-def versionPatch = 1
+def versionPatch = 2
 
 group 'ka.masato.library.device'
 archivesBaseName = 'grideyelib'

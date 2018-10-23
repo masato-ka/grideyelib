@@ -44,7 +44,7 @@ jobs:
       JVM_OPTS: -Xmx3200m
       TERM: dumb
     steps:
-    -checkout
+    - checkout
     - restore_cache:
         keys:
         - v1-dependencies-{{ checksum "build.gradle" }}-{{ checksum  "grideyelib/build.gradle" }}
