@@ -4,8 +4,8 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
 def versionMajor = 0
-def versionMinor = 5
-def versionPatch = 0
+def versionMinor = 6
+def versionPatch = 2
 
 group 'ka.masato.library.device'
 archivesBaseName = 'grideyelib'
