@@ -190,9 +190,9 @@ public class GridEyeDriver {
 
         ByteBuffer bb = ByteBuffer.allocate(8 * 8 * 2).order(ByteOrder.LITTLE_ENDIAN);
 
-        for (int i = 1; i <= 4; i++) {
-            byte[] buffer = new byte[32 * 1];
-            i2cDevice.readRegBuffer(0x80, buffer, 32);
+        for (int i = 0; i < 4; i++) {
+            byte[] buffer = new byte[32];
+            i2cDevice.readRegBuffer(0x80 + (32 * i), buffer, 32);
             bb.put(buffer);
         }
 
